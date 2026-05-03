@@ -21,10 +21,8 @@ public class DataSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // Kiem tra du lieu da ton tai chua
         if (departmentRepository.count() == 0 && employeeRepository.count() == 0) {
 
-            // Tao Department truoc
             Department itDept = Department.builder()
                     .name("Information Technology")
                     .location("Hanoi - Floor 5")
@@ -44,7 +42,6 @@ public class DataSeeder implements CommandLineRunner {
             departmentRepository.save(hrDept);
             departmentRepository.save(salesDept);
 
-            // Tao Employee va gan Department
             Employee emp1 = Employee.builder()
                     .name("Nguyen Van A")
                     .age(28)

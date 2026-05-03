@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Them moi nhan vien</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+    <h1 class="mb-4">Them moi nhan vien</h1>
+
+    <form th:action="@{/employees/save}"
+          th:object="${employee}"
+          method="post"
+          enctype="multipart/form-data">
+
+        <div class="mb-3">
+            <label class="form-label">Ten nhan vien</label>
+            <input type="text" class="form-control" th:field="*{name}" required>
+            <span class="text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Tuoi</label>
+            <input type="number" class="form-control" th:field="*{age}" required>
+            <span class="text-danger" th:if="${#fields.hasErrors('age')}" th:errors="*{age}"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Trang thai</label>
+            <select class="form-select" th:field="*{status}">
+                <option th:value="true">Active</option>
+                <option th:value="false">Inactive</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Phong ban</label>
+            <select class="form-select" th:field="*{department}">
+                <option value="">-- Chon phong ban --</option>
+                <option th:each="dept : ${departments}"
+                        th:value="${dept.id}"
+                        th:text="${dept.name}">
+                </option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Anh dai dien</label>
+            <input type="file" class="form-control" name="file" accept="image/*">
+        </div>
+
+        <button type="submit" class="btn btn-primary">Luu</button>
+        <a th:href="@{/templates/employees}" class="btn btn-secondary">Huy</a>
+    </form>
+</div>
+</body>
+</html>

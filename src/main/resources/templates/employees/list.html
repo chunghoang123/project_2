@@ -1,52 +1,162 @@
 <!DOCTYPE html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Liste des Employees</title>
+    <title>Danh sach nhan vien</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        .avatar { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; }
-        .status-active { color: #198754; font-weight: bold; }
-        .status-inactive { color: #dc3545; font-weight: bold; }
+        .avatar-thumb {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ddd;
+        }
+        .sort-link { color: white; text-decoration: none; }
+        .sort-link:hover { color: #ffc107; }
     </style>
 </head>
 <body>
 <div class="container mt-5">
-    <h1 class="mb-4">Liste des Employees</h1>
+    <div class="d-flex justify-content-between mb-4">
+        <h1>Danh sach nhan vien</h1>
+        <div>
+            <a th:href="@{/departments}" class="btn btn-info">Quan ly phong ban</a>
+            <a th:href="@{/employees/new}" class="btn btn-success">Them moi</a>
+        </div>
+    </div>
+
+    <form th:action="@{/employees}" method="get" class="card p-3 mb-4 bg-light">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">Ten nhan vien</label>
+                <input type="text" name="name" class="form-control"
+                       placeholder="Nhap ten..." th:value="${name}"/>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Phong ban</label>
+                <select name="departmentId" class="form-select">
+                    <option value="">-- Tat ca --</option>
+                    <option th:each="dept : ${departments}"
+                            th:value="${dept.id}"
+                            th:text="${dept.name}"
+                            th:selected="${departmentId != null and departmentId == dept.id}">
+                    </option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Tuoi tu</label>
+                <input type="number" name="minAge" class="form-control"
+                       th:value="${minAge}" min="0"/>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Tuoi den</label>
+                <input type="number" name="maxAge" class="form-control"
+                       th:value="${maxAge}" min="0"/>
+            </div>
+            <div class="col-md-2 d-flex align-items-end gap-2">
+                <input type="hidden" name="sortField" th:value="${sortField}"/>
+                <input type="hidden" name="sortDir" th:value="${sortDir}"/>
+                <button type="submit" class="btn btn-primary">Loc</button>
+                <a th:href="@{/employees}" class="btn btn-secondary">Reset</a>
+            </div>
+        </div>
+        <div class="mt-2 text-muted">
+            <small>Tong: <strong th:text="${totalItems}">0</strong> nhan vien</small>
+        </div>
+    </form>
 
     <table class="table table-striped table-hover table-bordered">
         <thead class="table-dark">
         <tr>
             <th>ID</th>
             <th>Avatar</th>
-            <th>Nom</th>
-            <th>Ages</th>
-            <th>Statut</th>
-            <th>Despartement</th>
-            <th>Localisation</th>
+            <th>
+                <a class="sort-link"
+                   th:href="@{/employees(page=0, sortField='name', sortDir=${sortField == 'name' ? reverseSortDir : 'asc'},
+                              name=${name}, departmentId=${departmentId}, minAge=${minAge}, maxAge=${maxAge})}">
+                    Ten
+                    <span th:if="${sortField == 'name'}">
+                        <span th:if="${sortDir == 'asc'}">&#9650;</span>
+                        <span th:if="${sortDir == 'desc'}">&#9660;</span>
+                    </span>
+                </a>
+            </th>
+            <th>
+                <a class="sort-link"
+                   th:href="@{/employees(page=0, sortField='age', sortDir=${sortField == 'age' ? reverseSortDir : 'asc'},
+                              name=${name}, departmentId=${departmentId}, minAge=${minAge}, maxAge=${maxAge})}">
+                    Tuoi
+                    <span th:if="${sortField == 'age'}">
+                        <span th:if="${sortDir == 'asc'}">&#9650;</span>
+                        <span th:if="${sortDir == 'desc'}">&#9660;</span>
+                    </span>
+                </a>
+            </th>
+            <th>Trang thai</th>
+            <th>Phong ban</th>
         </tr>
         </thead>
         <tbody>
         <tr th:each="emp : ${employees}">
-            <td th:text="${emp.id}">1</td>
+            <td th:text="${emp.id}"></td>
             <td>
-                <img th:src="${emp.avatar}" alt="avatar" class="avatar"/>
+                <img th:src="${emp.avatar != null and !emp.avatar.isEmpty()}
+                              ? @{'/uploads/' + ${emp.avatar}}
+                              : 'https://via.placeholder.com/60?text=N/A'"
+                     class="avatar-thumb" alt="avatar"/>
             </td>
-            <td th:text="${emp.name}">Nom</td>
-            <td th:text="${emp.age}">25</td>
+            <td th:text="${emp.name}"></td>
+            <td th:text="${emp.age}"></td>
             <td>
-                <span th:if="${emp.status}" class="status-active">Actif</span>
-                <span th:unless="${emp.status}" class="status-inactive">Inactif</span>
+                <span th:if="${emp.status}" class="badge bg-success">Active</span>
+                <span th:unless="${emp.status}" class="badge bg-danger">Inactive</span>
             </td>
-            <td th:text="${emp.department.name}">IT</td>
-            <td th:text="${emp.department.location}">Hanoi</td>
+            <td th:text="${emp.department != null} ? ${emp.department.name} : 'Chua phan bo'"></td>
         </tr>
         <tr th:if="${#lists.isEmpty(employees)}">
-            <td colspan="7" class="text-center">Aucun employee trouves
-                .</td>
+            <td colspan="6" class="text-center text-muted py-4">
+                <h5>Khong tim thay nhan vien nao.</h5>
+                <p>Vui long thu lai voi tieu chi khac.</p>
+            </td>
         </tr>
         </tbody>
     </table>
+
+    <!-- Phan trang giu lai bo loc -->
+    <nav th:if="${totalPages > 0}">
+        <ul class="pagination justify-content-center">
+            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{/employees(page=${currentPage - 1}, sortField=${sortField}, sortDir=${sortDir},
+                              name=${name}, departmentId=${departmentId}, minAge=${minAge}, maxAge=${maxAge})}">
+                    Trang truoc
+                </a>
+            </li>
+            <li class="page-item"
+                th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                th:classappend="${i == currentPage} ? 'active'">
+                <a class="page-link"
+                   th:href="@{/employees(page=${i}, sortField=${sortField}, sortDir=${sortDir},
+                              name=${name}, departmentId=${departmentId}, minAge=${minAge}, maxAge=${maxAge})}"
+                   th:text="${i + 1}">1</a>
+            </li>
+            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{/employees(page=${currentPage + 1}, sortField=${sortField}, sortDir=${sortDir},
+                              name=${name}, departmentId=${departmentId}, minAge=${minAge}, maxAge=${maxAge})}">
+                    Trang sau
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="text-center text-muted">
+        <small th:if="${totalPages > 0}">
+            Trang <strong th:text="${currentPage + 1}">1</strong>
+            / <strong th:text="${totalPages}">1</strong>
+        </small>
+    </div>
 </div>
 </body>
 </html>

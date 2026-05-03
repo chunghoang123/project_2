@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Danh sach phong ban</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+    <div class="d-flex justify-content-between mb-4">
+        <h1>Danh sach phong ban</h1>
+        <a th:href="@{/templates/employees}" class="btn btn-secondary">Ve danh sach nhan vien</a>
+    </div>
+
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <span th:text="${successMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="${errorMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <table class="table table-striped table-hover table-bordered">
+        <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Ten phong ban</th>
+            <th>Dia diem</th>
+            <th>Hanh dong</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="dept : ${departments}">
+            <td th:text="${dept.id}"></td>
+            <td th:text="${dept.name}"></td>
+            <td th:text="${dept.location}"></td>
+            <td>
+                <!-- Form xoa - dung POST de bao mat -->
+                <form th:action="@{/templates/departments/delete/{id}(id=${dept.id})}" method="post"
+                      onsubmit="return confirm('Ban co chac muon xoa phong ban nay? Tat ca nhan vien thuoc phong ban se duoc go gan.');">
+                    <button type="submit" class="btn btn-danger btn-sm">Xoa</button>
+                </form>
+            </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(departments)}">
+            <td colspan="4" class="text-center">Khong co phong ban nao.</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

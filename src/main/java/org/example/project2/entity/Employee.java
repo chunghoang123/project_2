@@ -1,6 +1,7 @@
 package org.example.project2.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 @Entity
@@ -16,9 +17,12 @@ public class Employee {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Ten khong duoc de trong")
     @Column(nullable = false, length = 100)
     private String name;
 
+    @NotNull(message = "Tuoi khong duoc de trong")
+    @Min(value = 18, message = "Tuoi phai tu 18 tro len")
     @Column(nullable = false)
     private Integer age;
 
